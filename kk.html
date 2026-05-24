@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Hunter System</title>
+    <style>
+        :root {
+            --sys-blue: #00d2ff;
+            --sys-dark: #0a0f18;
+            --sys-panel: rgba(10, 20, 35, 0.9);
+            --sys-border: rgba(0, 210, 255, 0.4);
+            --sys-text: #e0f7fa;
+            --sys-glow: 0 0 10px rgba(0, 210, 255, 0.6);
+        }
+
+        body {
+            background-color: var(--sys-dark);
+            color: var(--sys-text);
+            font-family: 'Courier New', Courier, monospace;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        .system-window {
+            background: var(--sys-panel);
+            border: 2px solid var(--sys-blue);
+            box-shadow: var(--sys-glow);
+            border-radius: 8px;
+            width: 100%;
+            max-width: 600px;
+            padding: 25px;
+            position: relative;
+        }
+
+        .system-window::before {
+            content: "[ SYSTEM ALERT ]";
+            position: absolute;
+            top: -12px;
+            left: 20px;
+            background: var(--sys-dark);
+            color: var(--sys-blue);
+            padding: 0 10px;
+            font-weight: bold;
+        }
+
+        h1, h2, h3 {
+            color: var(--sys-blue);
+            text-align: center;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-top: 0;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            color: var(--sys-blue);
+        }
+
+        input, textarea, select {
+            width: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid var(--sys-border);
+            color: white;
+            padding: 10px;
+            font-family: 'Courier New', Courier, monospace;
+            border-radius: 4px;
+            box-sizing: border-box;
+            outline: none;
+        }
+
+        input:focus, textarea:focus {
+            border-color: var(--sys-blue);
+            box-shadow: inset 0 0 5px rgba(0, 210, 255, 0.3);
+        }
+
+        button {
+            width: 100%;
+            background: transparent;
+            color: var(--sys-blue);
+            border: 2px solid var(--sys-blue);
+            padding: 12px;
+            font-size: 16px;
+            font-weight: bold;
+            font-family: 'Courier New', Courier, monospace;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            border-radius: 4px;
+            margin-top: 15px;
+        }
+
+        button:hover {
+            background: var(--sys-blue);
+            color: var(--sys-dark);
+            box-shadow: var(--sys-glow);
+        }
+
+        .status-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 20px;
+            border-bottom: 1px solid var(--sys-border);
+            padding-bottom: 15px;
+        }
+
+        .stat-item {
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .stat-label { color: #88B04B; }
+        .stat-value { font-weight: bold; }
+
+        .quest-list {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        .quest-list li {
+            background: rgba(0, 210, 255, 0.1);
+            margin-bottom: 8px;
+            padding: 10px;
+            border-left: 3px solid var(--sys-blue);
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .error {
+            color: #ff4c4c;
+            text-align: center;
+            margin-bottom: 15px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="init-screen" class="system-window">
+        <h1>Initialize Player</h1>
+        <p style="text-align: center; font-size: 14px;">Enter your real-world data to awaken as a Hunter.</p>
+        
+        <div id="error-msg" class="error hidden">All fields are required to initialize the System.</div>
+
+        <div class="form-group">
+            <label>Name</label>
+            <input type="text" id="p-name" placeholder="E.g. Sung Jinwoo">
+        </div>
+        <div class="status-grid" style="border: none; padding: 0; margin: 0; gap: 10px;">
+            <div class="form-group">
+                <label>Age</label>
+                <input type="number" id="p-age" placeholder="21">
+            </div>
+            <div class="form-group">
+                <label>Gender (Opt)</label>
+                <select id="p-gender">
+                    <option value="Male">Male</option>
+                    <option value="Female">Female</option>
+                    <option value="Other">Other</option>
+                </select>
+            </div>
+        </div>
+        <div class="status-grid" style="border: none; padding: 0; margin: 0; gap: 10px;">
+            <div class="form-group">
+                <label>Height</label>
+                <input type="text" id="p-height" placeholder="175cm / 5'9">
+            </div>
+            <div class="form-group">
+                <label>Weight</label>
+                <input type="text" id="p-weight" placeholder="70kg / 155lbs">
+            </div>
+        </div>
+        <div class="form-group">
+            <label>Current Physical Capabilities</label>
+            <textarea id="p-caps" rows="4" placeholder="E.g. I can do 20 pushups, run for 15 mins, and hold a 1 min plank..."></textarea>
+        </div>
+
+        <button onclick="awakenHunter()">Awaken</button>
+    </div>
+
+    <div id="status-screen" class="system-window hidden">
+        <h2>[ Hunter Status ]</h2>
+        
+        <div class="status-grid">
+            <div class="stat-item"><span class="stat-label">Name:</span> <span id="s-name" class="stat-value"></span></div>
+            <div class="stat-item"><span class="stat-label">Age:</span> <span id="s-age" class="stat-value"></span></div>
+            <div class="stat-item"><span class="stat-label">Race:</span> <span class="stat-value">Human</span></div>
+            <div class="stat-item"><span class="stat-label">Class:</span> <span class="stat-value">None</span></div>
+            <div class="stat-item"><span class="stat-label">Rank:</span> <span id="s-rank" class="stat-value" style="color: #FFD700;"></span></div>
+            <div class="stat-item"><span class="stat-label">Avg Stat:</span> <span id="s-avg" class="stat-value"></span></div>
+        </div>
+
+        <h3 style="text-align: left; margin-bottom: 10px; font-size: 16px;">Core Stats</h3>
+        <div class="status-grid">
+            <div class="stat-item"><span class="stat-label">STR (Strength):</span> <span id="s-str" class="stat-value"></span></div>
+            <div class="stat-item"><span class="stat-label">STA (Stamina):</span> <span id="s-sta" class="stat-value"></span></div>
+            <div class="stat-item"><span class="stat-label">END (Endurance):</span> <span id="s-end" class="stat-value"></span></div>
+            <div class="stat-item"><span class="stat-label">AGI (Agility):</span> <span id="s-agi" class="stat-value"></span></div>
+        </div>
+
+        <h3 style="text-align: left; margin-bottom: 10px; font-size: 16px;">Daily Hunter Missions</h3>
+        <ul id="s-quests" class="quest-list">
+            </ul>
+
+        <div style="margin-top: 20px; font-size: 14px; color: var(--sys-blue);">
+            <strong>System Note:</strong> Completion of tasks will yield stat rewards. Ensure proper rest to prevent HP depletion.
+        </div>
+    </div>
+
+    <script>
+        function awakenHunter() {
+            try {
+                // Get values
+                var name = document.getElementById('p-name').value.trim();
+                var age = document.getElementById('p-age').value.trim();
+                var height = document.getElementById('p-height').value.trim();
+                var weight = document.getElementById('p-weight').value.trim();
+                var caps = document.getElementById('p-caps').value.toLowerCase().trim();
+
+                // Validate
+                if (!name || !age || !height || !weight || !caps) {
+                    document.getElementById('error-msg').classList.remove('hidden');
+                    return;
+                }
+
+                document.getElementById('error-msg').classList.add('hidden');
+
+                // Base stats 5-10
+                var str = Math.floor(Math.random() * 5) + 5;
+                var sta = Math.floor(Math.random() * 5) + 5;
+                var end = Math.floor(Math.random() * 5) + 5;
+                var agi = Math.floor(Math.random() * 5) + 5;
+
+                // Extract numbers
+                var numbers = caps.match(/\d+/g);
+                var maxNum = 0;
+                if (numbers && numbers.length > 0) {
+                    for (var i = 0; i < numbers.length; i++) {
+                        var num = parseInt(numbers[i], 10);
+                        if (num > maxNum) maxNum = num;
+                    }
+                }
+
+                if (caps.indexOf("pushup") !== -1 || caps.indexOf("lift") !== -1) {
+                    str += (maxNum > 15 ? 6 : 3);
+                }
+                if (caps.indexOf("run") !== -1 || caps.indexOf("jog") !== -1) {
+                    sta += (maxNum > 10 ? 6 : 3);
+                    agi += 2;
+                }
+                if (caps.indexOf("plank") !== -1 || caps.indexOf("stamina") !== -1) {
+                    end += (maxNum > 30 ? 7 : 3);
+                }
+                if (caps.indexOf("sprint") !== -1 || caps.indexOf("jump") !== -1) {
+                    agi += 5;
+                }
+
+                // Cap initial stats to 20
+                if (str > 20) str = 20;
+                if (sta > 20) sta = 20;
+                if (end > 20) end = 20;
+                if (agi > 20) agi = 20;
+
+                // Calculate Rank
+                var avg = (str + sta + end + agi) / 4;
+                var rank = "F-Rank";
+                if (avg >= 281) rank = "National Level Hunter";
+                else if (avg >= 231) rank = "Peak S-Rank";
+                else if (avg >= 186) rank = "Mid S-Rank";
+                else if (avg >= 146) rank = "S-Rank";
+                else if (avg >= 111) rank = "A-Rank";
+                else if (avg >= 81) rank = "B-Rank";
+                else if (avg >= 56) rank = "C-Rank";
+                else if (avg >= 36) rank = "D-Rank";
+                else if (avg >= 21) rank = "E-Rank";
+
+                // Generate Quests
+                var workouts = [
+                    { name: "Pushups", reps: Math.floor(avg * 1.5) + 10, reward: "+0.20 STR, +0.10 END" },
+                    { name: "Squats", reps: Math.floor(avg * 2) + 15, reward: "+0.15 END, +0.10 AGI" },
+                    { name: "Sit-ups", reps: Math.floor(avg * 1.5) + 10, reward: "+0.20 STA" },
+                    { name: "Burpees", reps: Math.floor(avg * 0.8) + 5, reward: "+0.15 AGI, +0.15 END" },
+                    { name: "Plank (Secs)", reps: Math.floor(avg * 3) + 30, reward: "+0.20 END, +0.10 STA" }
+                ];
+
+                // Shuffle
+                workouts.sort(function() { return 0.5 - Math.random() });
+                var dailyMissions = workouts.slice(0, 4);
+
+                // Update UI
+                document.getElementById('s-name').innerText = name;
+                document.getElementById('s-age').innerText = age;
+                document.getElementById('s-str').innerText = str;
+                document.getElementById('s-sta').innerText = sta;
+                document.getElementById('s-end').innerText = end;
+                document.getElementById('s-agi').innerText = agi;
+                document.getElementById('s-avg').innerText = avg.toFixed(1);
+                document.getElementById('s-rank').innerText = rank;
+
+                var questContainer = document.getElementById('s-quests');
+                questContainer.innerHTML = ''; 
+                for (var j = 0; j < dailyMissions.length; j++) {
+                    var q = dailyMissions[j];
+                    var li = document.createElement('li');
+                    // Removed template literals (backticks) completely to prevent Mac mangling
+                    li.innerHTML = "<span>" + q.name + " — " + q.reps + "</span> <span style='color: #FFD700; font-size: 12px;'>" + q.reward + "</span>";
+                    questContainer.appendChild(li);
+                }
+
+                // Switch screens
+                document.getElementById('init-screen').classList.add('hidden');
+                document.getElementById('status-screen').classList.remove('hidden');
+
+            } catch (err) {
+                // If anything goes wrong, it will pop up an alert instead of silently failing
+                alert("System Alert - Code Error: " + err.message);
+            }
+        }
+    </script>
+</body>
+</html>
